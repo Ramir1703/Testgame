@@ -1,0 +1,106 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using DG.Tweening;
+
+public class playerMovment : MonoBehaviour
+{
+    public GameManager gm;
+    public Rigidbody rb;
+
+    public float strafeSpeed = 500f;
+    public float runSpeed = 500f;
+    public float jumpForce = 15f;
+
+
+    protected bool strafeLeft = false;
+    protected bool strafeRight = false;
+    protected bool doJump = false;
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.collider.tag == "Obstacle")
+        {
+            gm.EndGame();
+            Debug.Log("Game over");
+        }
+    }
+    // Update is called once per frame
+    void Update()
+    {
+        if (Input.GetKey("a"))
+        {
+            strafeLeft = true;
+        }
+        else
+        {
+            strafeLeft = false;
+        }
+        if (Input.GetKey("d"))
+        {
+            strafeRight = true;
+        }
+        else
+        {
+            strafeRight = false;
+
+        }
+        if (Input.GetKeyDown("space"))
+        {
+            doJump = true;
+        }
+        if (transform.position.y < -5f)
+        {
+            gm.EndGame();
+            Debug.Log("Well, tough luck");
+        }
+        if (transform.position.y > 8f) 
+        {
+
+            gm.EndGame(); /*(transform.position.x > 5f && transform.position.y > 3f && transform.position.x > -5f && transform.position.y > 3f)*/
+            Debug.Log("Don't you dare cheat here"); 
+
+        }
+        if (transform.position.x < -4.5f && transform.position.y < 3f)
+        {
+            gm.EndGame();
+            Debug.Log("I've thought this through)");
+        }
+        if (transform.position.x > 4.5f && transform.position.y < 3f)
+        {
+            gm.EndGame();
+            Debug.Log("I've thought this through)");
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        rb.AddForce(0, 0, runSpeed * Time.deltaTime);
+        //rb.MovePosition(transform.position + (runSpeed* Time.deltaTime* Vector3.forward));
+
+        if (strafeLeft)
+        {
+            rb.MovePosition(transform.position + Vector3.left * strafeSpeed * Time.deltaTime);
+            //rb.AddForce(-strafeSpeed * Time.deltaTime, 0, 0, ForceMode.VelocityChange);
+        }
+        if (strafeRight)
+        {
+            rb.MovePosition(transform.position + Vector3.right * strafeSpeed * Time.deltaTime);//*
+            //rb.AddForce(strafeSpeed * Time.deltaTime, 0, 0, ForceMode.VelocityChange);
+        }
+
+        if (doJump)
+        {
+            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+
+            transform.DORewind();
+            transform.DOShakeScale(.5f, .5f, 3, 30);
+
+            doJump = false;
+        }
+
+
+
+    }
+
+}
